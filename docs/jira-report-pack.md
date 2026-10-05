@@ -9,6 +9,8 @@ Everything you need to update the lab coordinators in Jira:
 
 Fill in anything in `<angle brackets>`.
 
+**Repository:** https://github.com/victormpahane/xroad-ls-lab (public). Link to it from Jira instead of attaching large files where you can.
+
 ---
 
 ## Before you start: be transparent about how it was built
@@ -25,9 +27,17 @@ browser walkthroughs document every step. Suggested wording for the summary comm
 Only write the last sentence if it is true. If you have time, redo a phase yourself in the browser
 (for example, reset only the Central Server or add a fourth subsystem) and say so. That is strong evidence.
 
+If you carried out the 4 October rebuild yourself in the admin pages, say so here, and link the
+rebuild report with its 17 screenshots: https://github.com/victormpahane/xroad-ls-lab/tree/main/reports/2026-10-04-rebuild. That is your strongest evidence.
+
 ---
 
 ## 1. Screenshot shot list
+
+**Already captured:** 17 screenshots from the 4 October rebuild are in the repository, in
+[`reports/2026-10-04-rebuild/screenshots/`](https://github.com/victormpahane/xroad-ls-lab/tree/main/reports/2026-10-04-rebuild/screenshots). Use them where they show the same
+thing as a shot below, and capture only the missing ones (for example S01–S03 and the break-it
+experiments S25–S28).
 
 **How to take them on Ubuntu:** press **Print Screen**, choose **Selection** or **Window**, then click the
 capture button. Files are saved in `~/Pictures/Screenshots`. Rename each file with its code, e.g.
@@ -239,6 +249,8 @@ first. Registration takes effect only when the next global configuration is publ
 
 **Status:** <Done / In progress> · **Attach:** S03, S20 to S24, S25 to S28
 
+**Evidence online:** rebuild report and test screenshots: https://github.com/victormpahane/xroad-ls-lab/tree/main/reports/2026-10-04-rebuild
+
 **Results:**
 - Smoke test: **7 passed, 0 failed**, including "portal cannot bypass X-Road".
 - Portal decisions correct for all 5 sample applicants:
@@ -274,17 +286,24 @@ first. Registration takes effect only when the next global configuration is publ
 
 ### LAB-E7: Progress pushed to GitHub, learning notes written
 
-**Status:** <In progress>
+**Status:** <In progress: repository done; learning notes remaining>
+
+**Repository:** https://github.com/victormpahane/xroad-ls-lab (public)
 
 **Done so far:**
+- Created the GitHub repository and pushed the whole lab: Docker Compose environment, scripts,
+  smoke test, both ministry applications, all guides and the rebuild report with screenshots.
+  The README has a dated **Progress** table.
 - Corrected `README.md` (the three fixes above).
 - Wrote browser walkthroughs per phase (`docs/phase*-browser.md`).
 - Wrote `docs/XRoad-Lab-Build-Report.docx`: every command, with diagrams.
 - Wrote `docs/XRoad-Lab-Browser-Guide.docx`: the click-by-click route, troubleshooting and a checklist.
 
 **Remaining:**
-- Push to GitHub: <repo link>. The lab folder is not yet a git repository.
-- Revoke the API keys created during the build: Settings → API Keys on each server.
+- Write learning notes and push them to the repository.
+- Push the break-it experiments (with screenshots) as a new report in `reports/`.
+- Revoke any API keys created during the rebuild: **Settings → API Keys** on cs, and
+  **Keys and certificates → API Keys** on each Security Server.
 
 ---
 
@@ -303,7 +322,8 @@ first. Registration takes effect only when the next global configuration is publ
 > - a REST and a SOAP service, published by MOHA and accessible only to GRANTS-PORTAL.
 >
 > The end-to-end test passes (smoke test 7/7). Portal decisions are correct for all sample applicants, and
-> MOHA's audit log records the verified caller for every request.
+> MOHA's audit log records the verified caller for every request. The lab was reset and rebuilt on
+> 4 October; the rebuilt network also passes the smoke test 7/7.
 >
 > **Key learning.**
 > - X-Road federates trust, not data. Each ministry keeps its own data.
@@ -321,10 +341,13 @@ first. Registration takes effect only when the next global configuration is publ
 >
 > **How it was done.** <your transparency statement from the top of this file>
 >
-> **Documentation.** Build report (commands and API), Browser guide (click-by-click), and per-phase
-> walkthroughs in `docs/`.
+> **Repository and documentation.** Everything is on GitHub: https://github.com/victormpahane/xroad-ls-lab
+> - Build report (commands and API), Browser guide (click-by-click), REST and SOAP services, and per-phase
+>   walkthroughs in `docs/`;
+> - rebuild report with 17 screenshots: https://github.com/victormpahane/xroad-ls-lab/tree/main/reports/2026-10-04-rebuild.
 >
-> **Next.** Finish the break-it experiments (LAB-E6), push to GitHub, and write learning notes (LAB-E7).
+> **Next.** Finish the break-it experiments (LAB-E6) and write learning notes (LAB-E7), both pushed to
+> the repository.
 > Then compare the lab with a production set-up: package install, a real CA, HTTPS between information
 > systems and Security Servers, HSMs and individual admin accounts.
 
