@@ -1,0 +1,352 @@
+### p0-check
+. /etc/os-release; echo "OS: $PRETTY_NAME"
+id -nG                          # is "docker" in your groups?
+docker --version
+docker compose version
+docker info >/dev/null 2>&1 && echo "docker reachable"
+grep "# x-road lab" /etc/hosts  # host names set?
+timedatectl show -p NTPSynchronized --value   # want: yes
+### p0-packages
+dpkg -l | grep -E 'docker|containerd' | awk '{print $2, $3}'
+### p0-packages-out
+containerd 2.2.2-0ubuntu1                         <- Ubuntu package
+containerd.io 2.2.4-1~ubuntu.26.04~resolute       <- Docker's package
+docker-buildx-plugin 0.34.0-1~ubuntu.26.04~resolute
+docker-ce 5:29.5.2-1~ubuntu.26.04~resolute
+docker-ce-cli 5:29.5.2-1~ubuntu.26.04~resolute
+docker-ce-rootless-extras 5:29.5.2-1~ubuntu.26.04~resolute
+docker-compose-v2 2.40.3+ds1-0ubuntu1             <- Ubuntu package
+docker.io 29.1.3-0ubuntu4.1                       <- Ubuntu package
+### p0-preflight
+cd ~/xroad-ls-lab
+bash scripts/preflight.sh
+### p0-preflight-out
+== System
+  OK    Ubuntu 26.04 LTS
+  OK    12 CPU threads
+  OK    15 GB RAM
+  OK    67 GB free for Docker (/var/lib/docker)
+== Clock (X-Road certificates, OCSP and time-stamps all depend on it)
+  OK    clock synchronised with NTP (13:32 SAST)
+  WARN  hardware clock in UTC. With a Windows dual boot, Ubuntu can start 2 h off until NTP corrects it
+== Docker
+  OK    Docker Engine 29.5.2 reachable without sudo
+  OK    Docker Compose version 2.40.3+ds1-0ubuntu1
+== Ports (must be free on 127.0.0.1)
+  OK    all 13 lab ports free (or used by the lab)
+== Browser setup
+  WARN  lab host names not set; admin UIs on plain localhost will log each other out
+        fix: bash scripts/setup-hosts.sh
+  OK    browser found: firefox
+  OK    browser found: google-chrome
+== 0 failed, 2 warnings
+Ready: docker compose up -d --build
+### p0-up
+docker compose up -d --build         # first run downloads several GB
+docker compose ps                    # want: 7 containers "Up"
+bash scripts/setup-hosts.sh          # asks for your sudo password
+### p0-wait
+# wait until the Central Server UI answers (it took about 30 seconds here)
+until [ "$(curl -sk -o /dev/null -w '%{http_code}' https://127.0.0.1:4000/)" = 200 ]; do sleep 10; done
+# the other endpoints
+for p in 1000 2000 3000; do echo "ss port $p: $(curl -sk -o /dev/null -w '%{http_code}' https://127.0.0.1:$p/)"; done
+curl -s -o /dev/null -w "portal: %{http_code}\n"   http://localhost:8500
+curl -s -o /dev/null -w "registry: %{http_code}\n" http://localhost:8001/audit
+curl -s -o /dev/null -w "testca: %{http_code}\n"   http://localhost:8888/testca/
+### api-key
+# Create an API key on a server (here: cs). Basic auth with xrd/secret is
+# accepted only from inside the container, i.e. from localhost.
+docker exec cs curl -sk -u xrd:secret -X POST https://localhost:4000/api/v1/api-keys \
+  -H 'Content-Type: application/json' \
+  -d '["XROAD_SYSTEM_ADMINISTRATOR","XROAD_SECURITY_OFFICER","XROAD_REGISTRATION_OFFICER"]'
+# answer: {"id":4,"key":"c7ef3d56-....","roles":[...]}
+### api-pattern
+K=<the key from the previous step>
+A=https://localhost:4000/api/v1
+docker exec cs curl -sk -H "Authorization: X-Road-ApiKey token=$K" $A/initialization/status
+### api-spec
+# The API description (OpenAPI) ships inside the admin service's jar file:
+docker cp cs:/usr/share/xroad/jlib/centralserver-admin-service-1.0.jar cs.jar
+unzip -o -q cs.jar BOOT-INF/lib/openapi-model-1.0.jar
+unzip -o -q BOOT-INF/lib/openapi-model-1.0.jar openapi-definition.yaml
+# Security Server: proxy-ui-api-1.0.jar -> META-INF/openapi-definition.yaml
+### p1-init
+docker exec cs curl -sk -H "Authorization: X-Road-ApiKey token=$K" \
+  -H 'Content-Type: application/json' -X POST $A/initialization \
+  -d '{"instance_identifier":"LS-DEV","central_server_address":"cs","software_token_pin":"123456xrd!"}'
+docker exec cs curl -sk -H "Authorization: X-Road-ApiKey token=$K" $A/initialization/status
+# {"software_token_init_status":"INITIALIZED","instance_identifier":"LS-DEV","central_server_address":"cs"}
+### p1-class
+docker exec cs curl -sk -H "Authorization: X-Road-ApiKey token=$K" -H 'Content-Type: application/json' \
+  -X POST $A/member-classes -d '{"code":"GOV","description":"Government"}'
+# later corrected to the README wording:
+docker exec cs curl -sk -H "Authorization: X-Road-ApiKey token=$K" -H 'Content-Type: application/json' \
+  -X PATCH $A/member-classes/GOV -d '{"description":"Government ministries and agencies"}'
+### p1-certs
+bash scripts/fetch-ca-certs.sh
+# certs/ca.pem    subject=O=Test, CN=Test CA
+# certs/ocsp.pem  subject=O=Test, CN=Test OCSP
+# certs/tsa.pem   subject=O=Test, CN=Test TSA
+for f in ca ocsp tsa; do docker cp certs/$f.pem cs:/tmp/$f.pem; done
+### p1-script
+# Runs INSIDE the cs container: docker cp p1.sh cs:/tmp/ && docker exec cs bash /tmp/p1.sh
+K=<cs API key>; A="https://localhost:4000/api/v1"
+c(){ curl -sk -H "Authorization: X-Road-ApiKey token=$K" "$@"; }
+j(){ c -H 'Content-Type: application/json' "$@"; }
+
+# 1.3 certification service + OCSP responder
+c -X POST $A/certification-services -F certificate=@/tmp/ca.pem \
+  -F certificate_profile_info=ee.ria.xroad.common.certificateprofile.impl.FiVRKCertificateProfileInfoProvider \
+  -F tls_auth=false
+c -X POST $A/certification-services/1/ocsp-responders -F url=http://ca:8888 -F certificate=@/tmp/ocsp.pem
+
+# 1.4 time-stamping service
+c -X POST $A/timestamping-services -F url=http://ca:8899 -F certificate=@/tmp/tsa.pem
+
+# 1.5 members and subsystems
+add(){ j -X POST $A/members -d "{\"member_name\":\"$3\",\"member_id\":{\"member_class\":\"GOV\",\"member_code\":\"$1\"}}"
+       j -X POST $A/subsystems -d "{\"subsystem_id\":{\"member_class\":\"GOV\",\"member_code\":\"$1\",\"subsystem_code\":\"$2\"}}"; }
+add MCST MANAGEMENT          "Ministry of Communications, Science and Technology"
+add MOSD GRANTS-PORTAL       "Ministry of Social Development"
+add MOHA POPULATION-REGISTRY "Ministry of Home Affairs"
+
+# 1.6 management services provider
+j -X PATCH $A/management-services-configuration -d '{"service_provider_id":"LS-DEV:GOV:MCST:MANAGEMENT"}'
+### p1-keys
+# 1.7 token login (answered 400 token_action_not_possible: already logged in by XROAD_TOKEN_PIN)
+j -X PUT $A/tokens/0/login -d '{"password":"123456xrd!"}'
+j -X POST $A/configuration-sources/INTERNAL/signing-keys -d '{"token_id":"0","key_label":"internal-signing-key"}'
+j -X POST $A/configuration-sources/EXTERNAL/signing-keys -d '{"token_id":"0","key_label":"external-signing-key"}'
+
+# 1.8 anchor
+c $A/configuration-sources/INTERNAL/anchor
+c -o /tmp/anchor.xml $A/configuration-sources/INTERNAL/anchor/download
+### p1-anchor
+docker cp cs:/tmp/anchor.xml ~/Downloads/configuration_anchor_LS-DEV.xml
+### p1-verify
+c $A/notifications/alerts                                # []  = no red banners
+c -o /dev/null -w "%{http_code}\n" http://localhost/internalconf   # 200 = config published
+### p2-init
+docker exec ss1 curl -sk -u xrd:secret -X POST https://localhost:4000/api/v1/api-keys \
+  -H 'Content-Type: application/json' \
+  -d '["XROAD_SYSTEM_ADMINISTRATOR","XROAD_SECURITY_OFFICER","XROAD_REGISTRATION_OFFICER","XROAD_SERVICE_ADMINISTRATOR"]'
+docker cp ~/Downloads/configuration_anchor_LS-DEV.xml ss1:/tmp/anchor.xml
+
+# inside ss1 (K = ss1's key, c() as before)
+c -X POST $A/system/anchor -H 'Content-Type: application/octet-stream' --data-binary @/tmp/anchor.xml
+c -X POST $A/initialization -H 'Content-Type: application/json' \
+  -d '{"owner_member_class":"GOV","owner_member_code":"MCST","security_server_code":"SS1","software_token_pin":"123456xrd!","ignore_warnings":true}'
+c -X PUT $A/tokens/0/login -H 'Content-Type: application/json' -d '{"password":"123456xrd!"}'
+c -X POST $A/system/timestamping-services -H 'Content-Type: application/json' -d '{"name":"Test TSA","url":"http://ca:8899"}'
+### p2-fields
+c "$A/certificate-authorities/Test%20CA/csr-subject-fields?key_usage_type=SIGNING&member_id=LS-DEV:GOV:MCST"
+# CN = MCST (read-only), C = FI (read-only), serialNumber = LS-DEV/SS1/GOV (read-only),
+# O = (you type it), subjectAltName = (you type it, REQUIRED in 7.7.0)
+### p2-csr
+O="Ministry of Communications Science and Technology"     # no comma! see problem 2
+j -X POST $A/tokens/0/keys-with-csrs -d "{\"key_label\":\"ss1-sign\",\"csr_generate_request\":{
+     \"key_usage_type\":\"SIGNING\",\"ca_name\":\"Test CA\",\"csr_format\":\"DER\",
+     \"member_id\":\"LS-DEV:GOV:MCST\",\"subject_field_values\":{\"O\":\"$O\",\"subjectAltName\":\"ss1\"}}}"
+j -X POST $A/tokens/0/keys-with-csrs -d "{\"key_label\":\"ss1-auth\",\"csr_generate_request\":{
+     \"key_usage_type\":\"AUTHENTICATION\",\"ca_name\":\"Test CA\",\"csr_format\":\"DER\",
+     \"subject_field_values\":{\"O\":\"$O\",\"CN\":\"ss1\",\"subjectAltName\":\"ss1\"}}}"
+# each answer contains key.id and csr_id; download the CSR as DER:
+c -o /tmp/ss1_sign.der "$A/keys/<key id>/csrs/<csr id>?csr_format=DER"
+### p2-error
+java.lang.IllegalArgumentException: badly formatted directory string
+... "subjectName":"C=FI, O=Ministry of Communications, Science and Technology, serialNumber=LS-DEV/SS1/GOV, CN=MCST"
+{"status":500,"error":{"code":"core.Signer.InternalError","metadata":["UNKNOWN","tr.null","tr.check_signer_logs"]}}
+### p2-sign
+# on your laptop: the same form as http://localhost:8888/testca/
+docker cp ss1:/tmp/ss1_sign.der . ; docker cp ss1:/tmp/ss1_auth.der .
+curl -s -F certreq=@ss1_sign.der -F type=sign -o ss1_sign.pem http://localhost:8888/testca/sign
+curl -s -F certreq=@ss1_auth.der -F type=auth -o ss1_auth.pem http://localhost:8888/testca/sign
+openssl x509 -in ss1_auth.pem -noout -subject -ext keyUsage,subjectAltName
+### p2-sign-out
+subject=C=FI, O=Ministry of Communications Science and Technology, CN=MCST, serialNumber=LS-DEV/SS1/GOV
+X509v3 Key Usage: critical
+    Non Repudiation                                   <- signing certificate
+subject=C=FI, O=Ministry of Communications Science and Technology, CN=ss1, serialNumber=LS-DEV/SS1/GOV
+X509v3 Key Usage: critical
+    Digital Signature, Key Encipherment, Data Encipherment, Key Agreement   <- auth certificate
+X509v3 Subject Alternative Name:
+    DNS:ss1
+### p2-import
+c -X POST $A/token-certificates -H 'Content-Type: application/octet-stream' --data-binary @/tmp/ss1_auth.pem
+#  -> hash B89E7FFB...; status SAVED, active false
+c -X PUT $A/token-certificates/<auth hash>/activate
+c -X POST $A/token-certificates -H 'Content-Type: application/octet-stream' --data-binary @/tmp/ss1_sign.pem
+#  -> status REGISTERED, active true (signing certificates need no registration)
+c -X PUT $A/token-certificates/<auth hash>/register -H 'Content-Type: application/json' -d '{"address":"ss1"}'
+### p2-approve
+# on cs
+c "$A/management-requests?status=WAITING"
+# id 1, AUTH_CERT_REGISTRATION_REQUEST, LS-DEV:GOV:MCST:SS1, address ss1, WAITING
+c -X POST $A/management-requests/1/approval
+# back on ss1, after about 40 s:
+c "$A/clients?show_members=true"      # LS-DEV:GOV:MCST  REGISTERED
+### p2-mgmt
+# on ss1: add the subsystem and try to register it (fails on purpose)
+j -X POST $A/clients -d '{"client":{"member_class":"GOV","member_code":"MCST","subsystem_code":"MANAGEMENT"},"ignore_warnings":true}'
+j -X PUT $A/clients/LS-DEV:GOV:MCST:MANAGEMENT/register
+# {"status":500,"error":{"code":"core.Server.ClientProxy.UnknownMember",
+#  "metadata":["Could not find addresses for service provider \"SERVICE:LS-DEV/GOV/MCST/MANAGEMENT/clientReg\""]}}
+
+# on cs: make SS1 the management services' Security Server (this registers MANAGEMENT on SS1)
+j -X POST $A/management-services-configuration/register-provider -d '{"security_server_id":"LS-DEV:GOV:MCST:SS1"}'
+# on ss1 after about 60 s: LS-DEV:GOV:MCST:MANAGEMENT  REGISTERED
+### p2-wsdl
+C=LS-DEV:GOV:MCST:MANAGEMENT
+j -X POST $A/clients/$C/service-descriptions -d '{"url":"http://cs/managementservices.wsdl","type":"WSDL","ignore_warnings":true}'
+c -X PUT $A/service-descriptions/8/enable
+# every one of the 10 services showed:  url = http://INSERT_MANAGEMENT_SERVICE_ADDRESS_HERE
+### p2-fix
+# 8d  point all services at the Central Server
+j -X PATCH $A/services/$C:clientReg -d '{"url":"https://cs:4002/managementservice/manage/","timeout":60,
+     "ssl_auth":true,"url_all":true,"timeout_all":true,"ssl_auth_all":true,"ignore_warnings":true}'
+
+# 8e  trust cs's TLS certificate (the download is a .tar.gz)
+docker exec cs curl -sk -H "Authorization: X-Road-ApiKey token=$K_CS" \
+  https://localhost:4000/api/v1/management-services-configuration/download-certificate -o /tmp/cs-tls.tar.gz
+docker cp cs:/tmp/cs-tls.tar.gz . && tar -xzf cs-tls.tar.gz    # management-service.cer + .pem
+docker cp management-service.pem ss1:/tmp/cs-tls-cert
+c -X POST $A/clients/$C/tls-certificates -H 'Content-Type: application/octet-stream' --data-binary @/tmp/cs-tls-cert
+
+# 8f  give the security-server-owners global group access to every service
+for s in clientReg clientDeletion clientDisable clientEnable clientRename ownerChange \
+         authCertDeletion addressChange maintenanceModeEnable maintenanceModeDisable; do
+  j -X POST $A/services/$C:$s/service-clients \
+    -d '{"items":[{"id":"LS-DEV:security-server-owners","service_client_type":"GLOBALGROUP"}]}'
+done
+### p2-verify
+c $A/diagnostics/globalconf        # {"status_class":"OK","status_code":"SUCCESS",...}
+c $A/diagnostics/ocsp-responders   # http://ca:8888  OK / SUCCESS
+c $A/diagnostics/timestamping-services   # WAITING / ERROR_CODE_TIMESTAMP_UNINITIALIZED (normal: no messages yet)
+### p3-script
+#!/usr/bin/env bash
+# ss-setup.sh <container> <member_code> <server_code> "<O name>"
+# Phase 2 steps 1-7 for one Security Server, run from the laptop.
+set -u
+SS=$1 MC=$2 SC=$3 O=$4
+S=./work/$SS; mkdir -p $S
+K=$(docker exec $SS curl -sk -u xrd:secret -X POST https://localhost:4000/api/v1/api-keys -H 'Content-Type: application/json' \
+   -d '["XROAD_SYSTEM_ADMINISTRATOR","XROAD_SECURITY_OFFICER","XROAD_REGISTRATION_OFFICER","XROAD_SERVICE_ADMINISTRATOR"]' \
+   | python3 -c 'import sys,json;print(json.load(sys.stdin)["key"])')
+api(){ docker exec -i $SS curl -sk -H "Authorization: X-Road-ApiKey token=$K" "$@"; }
+A=https://localhost:4000/api/v1
+docker cp ~/Downloads/configuration_anchor_LS-DEV.xml $SS:/tmp/anchor.xml
+echo "== [$SS] anchor";  api -X POST $A/system/anchor -H 'Content-Type: application/octet-stream' --data-binary @/tmp/anchor.xml -o /dev/null -w "[HTTP %{http_code}]\n"
+echo "== [$SS] init $MC/$SC"; api -X POST $A/initialization -H 'Content-Type: application/json' -d "{\"owner_member_class\":\"GOV\",\"owner_member_code\":\"$MC\",\"security_server_code\":\"$SC\",\"software_token_pin\":\"123456xrd!\",\"ignore_warnings\":true}" -w "[HTTP %{http_code}]\n"
+echo "== [$SS] login";  api -X PUT $A/tokens/0/login -H 'Content-Type: application/json' -d '{"password":"123456xrd!"}' -o /dev/null -w "[HTTP %{http_code}]\n"
+echo "== [$SS] TSA";    api -X POST $A/system/timestamping-services -H 'Content-Type: application/json' -d '{"name":"Test TSA","url":"http://ca:8899"}' -o /dev/null -w "[HTTP %{http_code}]\n"
+for u in sign auth; do
+  if [ $u = sign ]; then US=SIGNING; X=",\"member_id\":\"LS-DEV:GOV:$MC\""; F="{\"O\":\"$O\",\"subjectAltName\":\"$SS\"}"
+  else US=AUTHENTICATION; X=""; F="{\"O\":\"$O\",\"CN\":\"$SS\",\"subjectAltName\":\"$SS\"}"; fi
+  r=$(api -X POST $A/tokens/0/keys-with-csrs -H 'Content-Type: application/json' -d "{\"key_label\":\"$SS-$u\",\"csr_generate_request\":{\"key_usage_type\":\"$US\",\"ca_name\":\"Test CA\",\"csr_format\":\"DER\"$X,\"subject_field_values\":$F}}")
+  read KID CID < <(echo "$r" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(d["key"]["id"],d["csr_id"])') || { echo "CSR FAIL: $r"; exit 1; }
+  api "$A/keys/$KID/csrs/$CID?csr_format=DER" > $S/${SS}_$u.der
+  curl -s -F certreq=@$S/${SS}_$u.der -F type=$u -o $S/${SS}_$u.pem http://localhost:8888/testca/sign
+  echo "== [$SS] $u cert: $(openssl x509 -in $S/${SS}_$u.pem -noout -subject)"
+done
+H=$(api -X POST $A/token-certificates -H 'Content-Type: application/octet-stream' --data-binary @- < $S/${SS}_auth.pem | python3 -c 'import sys,json;print(json.load(sys.stdin)["certificate_details"]["hash"])')
+echo "== [$SS] activate auth"; api -X PUT $A/token-certificates/$H/activate -o /dev/null -w "[HTTP %{http_code}]\n"
+echo "== [$SS] import sign"; api -X POST $A/token-certificates -H 'Content-Type: application/octet-stream' --data-binary @- < $S/${SS}_sign.pem -o /dev/null -w "[HTTP %{http_code}]\n"
+echo "== [$SS] register auth at $SS (via ss1 management services)"; api -X PUT $A/token-certificates/$H/register -H 'Content-Type: application/json' -d "{\"address\":\"$SS\"}" -w "[HTTP %{http_code}]\n"
+### p3-run
+bash ss-setup.sh ss2 MOSD SS2 "Ministry of Social Development"
+bash ss-setup.sh ss3 MOHA SS3 "Ministry of Home Affairs"
+### p3-run-out
+== [ss2] anchor                 [HTTP 201]
+== [ss2] init MOSD/SS2          [HTTP 201]
+== [ss2] login                  [HTTP 200]
+== [ss2] TSA                    [HTTP 201]
+== [ss2] sign cert: subject=C=FI, O=Ministry of Social Development, CN=MOSD, serialNumber=LS-DEV/SS2/GOV
+== [ss2] auth cert: subject=C=FI, O=Ministry of Social Development, CN=ss2, serialNumber=LS-DEV/SS2/GOV
+== [ss2] activate auth          [HTTP 204]
+== [ss2] import sign            [HTTP 201]
+== [ss2] register auth at ss2 (via ss1 management services)   [HTTP 204]
+   (ss3: identical, with MOHA / SS3 / "Ministry of Home Affairs" / CN=ss3)
+### p3-approve
+# on cs
+c "$A/management-requests?status=WAITING"
+# 3 AUTH_CERT_REGISTRATION_REQUEST SECURITY_SERVER LS-DEV:GOV:MOSD:SS2 ss2
+# 4 AUTH_CERT_REGISTRATION_REQUEST SECURITY_SERVER LS-DEV:GOV:MOHA:SS3 ss3
+c -X POST $A/management-requests/3/approval
+c -X POST $A/management-requests/4/approval
+c $A/security-servers
+# LS-DEV:GOV:MCST:SS1 ss1
+# LS-DEV:GOV:MOSD:SS2 ss2
+# LS-DEV:GOV:MOHA:SS3 ss3
+### p4
+# ss3 (K3 = ss3's key)
+j -X POST $A/clients -d '{"client":{"member_class":"GOV","member_code":"MOHA","subsystem_code":"POPULATION-REGISTRY"},"ignore_warnings":true}'
+j -X PUT  $A/clients/LS-DEV:GOV:MOHA:POPULATION-REGISTRY/register
+# ss2 (K2 = ss2's key)
+j -X POST $A/clients -d '{"client":{"member_class":"GOV","member_code":"MOSD","subsystem_code":"GRANTS-PORTAL"},"ignore_warnings":true}'
+j -X PUT  $A/clients/LS-DEV:GOV:MOSD:GRANTS-PORTAL/register
+
+# cs: two CLIENT_REGISTRATION_REQUESTs appear (ids 5 and 6)
+c -X POST $A/management-requests/5/approval
+c -X POST $A/management-requests/6/approval
+
+# ss2: the portal talks plain HTTP to ss2:8080
+j -X PATCH $A/clients/LS-DEV:GOV:MOSD:GRANTS-PORTAL -d '{"connection_type":"HTTP"}'
+### p5
+# all on ss3
+C=LS-DEV:GOV:MOHA:POPULATION-REGISTRY
+j -X POST $A/clients/$C/service-descriptions \
+  -d '{"url":"http://moha-registry:8000/openapi.yaml","type":"OPENAPI3","rest_service_code":"population-api","ignore_warnings":true}'
+j -X POST $A/clients/$C/service-descriptions \
+  -d '{"url":"http://moha-registry:8000/soap/population.wsdl","type":"WSDL","ignore_warnings":true}'
+c -X PUT $A/service-descriptions/9/enable      # the REST description
+c -X PUT $A/service-descriptions/14/enable     # the WSDL description
+for s in population-api verifyIdentity.v1; do
+  j -X POST $A/services/$C:$s/service-clients \
+    -d '{"items":[{"id":"LS-DEV:GOV:MOSD:GRANTS-PORTAL","service_client_type":"SUBSYSTEM"}]}'
+done
+### p5-out
+WSDL http://moha-registry:8000/soap/population.wsdl  disabled=False
+    verifyIdentity.v1 -> http://moha-registry:8000/soap
+OPENAPI3 http://moha-registry:8000/openapi.yaml  disabled=False
+    population-api -> http://moha-registry:8000/api
+       endpoint * **
+       endpoint GET /citizens/*
+       endpoint GET /citizens/*/vital-status
+population-api clients:    ['LS-DEV:GOV:MOSD:GRANTS-PORTAL']
+verifyIdentity.v1 clients: ['LS-DEV:GOV:MOSD:GRANTS-PORTAL']
+### p5-check
+curl -H "X-Road-Client: LS-DEV/GOV/MOSD/GRANTS-PORTAL" \
+  http://localhost:2080/r1/LS-DEV/GOV/MOHA/POPULATION-REGISTRY/allowedMethods
+# -> service_code "population-api", GET /citizens/*, GET /citizens/*/vital-status
+### p6-smoke
+bash tests/smoke-test.sh
+### p6-smoke-out
+== Using consumer Security Server http://localhost:2080 as LS-DEV/GOV/MOSD/GRANTS-PORTAL
+PASS  REST metaservice listMethods shows population-api
+PASS  REST metaservice allowedMethods (access rights granted)
+PASS  REST getCitizen returns Thabo Letsie
+PASS  REST getVitalStatus returns DECEASED
+PASS  REST unknown citizen -> 404 from registry
+PASS  SOAP verifyIdentity returns match=true
+PASS  Portal cannot bypass X-Road to reach the registry
+== 7 passed, 0 failed
+### p6-portal
+# the same thing the "Check pension eligibility" button does
+curl -s -X POST http://localhost:8500/check \
+  -d "action=pension&national_id=150319480002&first_name=Thabo&surname=Letsie&dob=1948-03-15&officer=officer.ntsane"
+### p6-curl
+# REST: one citizen record
+curl -H "X-Road-Client: LS-DEV/GOV/MOSD/GRANTS-PORTAL" \
+  http://localhost:2080/r1/LS-DEV/GOV/MOHA/POPULATION-REGISTRY/population-api/citizens/150319480002
+# What may GRANTS-PORTAL call?
+curl -H "X-Road-Client: LS-DEV/GOV/MOSD/GRANTS-PORTAL" \
+  http://localhost:2080/r1/LS-DEV/GOV/MOHA/POPULATION-REGISTRY/allowedMethods
+# SOAP
+curl -H "Content-Type: text/xml; charset=utf-8" --data-binary @tests/verifyIdentity.xml http://localhost:2080/
+### p6-tsa
+c $A/diagnostics/timestamping-services     # on ss2 and ss3: [('OK', 'SUCCESS')]
+### daily
+docker compose stop      # end of a session: frees RAM, keeps all configuration
+docker compose start     # next session: everything comes back as it was
+docker compose ps        # all 7 Up?
+timedatectl status       # System clock synchronized: yes

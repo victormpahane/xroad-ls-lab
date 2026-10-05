@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="820" viewBox="0 0 1400 820" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1F3A5F"/></marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2E7D55"/></marker>
+    <marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5B6573"/></marker>
+  </defs>
+  <rect width="1400" height="820" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">One "Check pension eligibility" click, hop by hop</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">The REST call is shown. The SOAP verifyIdentity call takes exactly the same path a moment earlier.</text>
+
+  <!-- lifeline heads -->
+  <g font-size="19" font-weight="bold" text-anchor="middle">
+    <rect x="70" y="100" width="220" height="56" rx="10" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2"/><text x="180" y="135" fill="#2E7D55">mosd-portal</text>
+    <rect x="410" y="100" width="220" height="56" rx="10" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2"/><text x="520" y="135" fill="#2E7D55">ss2</text>
+    <rect x="770" y="100" width="220" height="56" rx="10" fill="#FBEFE2" stroke="#B5651D" stroke-width="2"/><text x="880" y="135" fill="#B5651D">ss3</text>
+    <rect x="1110" y="100" width="220" height="56" rx="10" fill="#FBEFE2" stroke="#B5651D" stroke-width="2"/><text x="1220" y="135" fill="#B5651D">moha-registry</text>
+  </g>
+  <g stroke="#9AA5B1" stroke-width="2" stroke-dasharray="6 6">
+    <line x1="180" y1="158" x2="180" y2="760"/><line x1="520" y1="158" x2="520" y2="760"/><line x1="880" y1="158" x2="880" y2="760"/><line x1="1220" y1="158" x2="1220" y2="760"/>
+  </g>
+
+  <g font-size="15" fill="#1F2933">
+    <!-- 1 -->
+    <line x1="182" y1="200" x2="514" y2="200" stroke="#1F3A5F" stroke-width="3" marker-end="url(#a)"/>
+    <text x="200" y="188" font-weight="bold">1  GET /r1/LS-DEV/GOV/MOHA/…/population-api/citizens/150319480002</text>
+    <text x="200" y="222">headers X-Road-Client: LS-DEV/GOV/MOSD/GRANTS-PORTAL, X-Road-UserId</text>
+    <!-- 2 -->
+    <rect x="530" y="240" width="330" height="96" rx="8" fill="#F7F8FA" stroke="#C9CFD8"/>
+    <text x="544" y="264" font-weight="bold">2  ss2 checks and signs</text>
+    <text x="544" y="288">client registered here? connection HTTP?</text>
+    <text x="544" y="310">sign with MOSD sign key; find ss3</text>
+    <text x="544" y="330">in global configuration</text>
+    <!-- 3 -->
+    <line x1="522" y1="370" x2="874" y2="370" stroke="#1F3A5F" stroke-width="4" marker-end="url(#a)"/>
+    <text x="540" y="360" font-weight="bold">3  mutual TLS, both auth certs shown</text>
+    <!-- 4 -->
+    <rect x="890" y="390" width="320" height="96" rx="8" fill="#F7F8FA" stroke="#C9CFD8"/>
+    <text x="904" y="414" font-weight="bold">4  ss3 verifies</text>
+    <text x="904" y="438">signature OK? certs valid (OCSP)?</text>
+    <text x="904" y="460">access right for GRANTS-PORTAL?</text>
+    <text x="904" y="480">service enabled?</text>
+    <!-- 5 -->
+    <line x1="882" y1="520" x2="1214" y2="520" stroke="#1F3A5F" stroke-width="3" marker-end="url(#a)"/>
+    <text x="900" y="510" font-weight="bold">5  GET http://moha-registry:8000/api/citizens/…</text>
+    <text x="900" y="542">+ verified X-Road-Client header</text>
+    <!-- 6 -->
+    <line x1="1218" y1="580" x2="886" y2="580" stroke="#2E7D55" stroke-width="3" marker-end="url(#b)"/>
+    <text x="920" y="570" font-weight="bold" fill="#2E7D55">6  200 OK + JSON record; ss3 signs it</text>
+    <!-- 7 -->
+    <line x1="878" y1="620" x2="526" y2="620" stroke="#2E7D55" stroke-width="4" marker-end="url(#b)"/>
+    <text x="600" y="610" font-weight="bold" fill="#2E7D55">7  signed response; ss2 verifies</text>
+    <!-- 8 -->
+    <line x1="518" y1="660" x2="186" y2="660" stroke="#2E7D55" stroke-width="3" marker-end="url(#b)"/>
+    <text x="214" y="650" font-weight="bold" fill="#2E7D55">8  plain JSON to the portal → ELIGIBLE</text>
+    <!-- 9 -->
+    <rect x="410" y="690" width="580" height="60" rx="8" fill="#FFF7D6" stroke="#9A7B00"/>
+    <text x="426" y="716" font-weight="bold" fill="#7A6100">9  ss2 and ss3 both write the signed messages to their</text>
+    <text x="426" y="738" fill="#7A6100">message log, time-stamped by the TSA (ca:8899)</text>
+  </g>
+  <text x="30" y="800" font-size="16" fill="#4A5563">Steps 1 and 8 are plain HTTP inside mosd-lan; 5 and 6 are plain HTTP inside moha-lan. Only step 3 crosses between organisations, and it is always mutual TLS.</text>
+</svg>

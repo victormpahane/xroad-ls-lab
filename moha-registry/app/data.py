@@ -1,0 +1,75 @@
+"""Synthetic population register for the Ministry of Home Affairs (MOHA).
+
+Every record here is invented for the lab. The national ID format
+(12 digits) is a placeholder, not the real Lesotho format.
+"""
+
+CITIZENS = {
+    "010119550001": {
+        "nationalId": "010119550001",
+        "firstName": "Mpho",
+        "surname": "Mokoena",
+        "dateOfBirth": "1955-01-01",
+        "sex": "F",
+        "district": "Maseru",
+        "village": "Ha Thetsane",
+        "citizenship": "LS",
+        "vitalStatus": "ALIVE",
+    },
+    "150319480002": {
+        "nationalId": "150319480002",
+        "firstName": "Thabo",
+        "surname": "Letsie",
+        "dateOfBirth": "1948-03-15",
+        "sex": "M",
+        "district": "Leribe",
+        "village": "Hlotse",
+        "citizenship": "LS",
+        "vitalStatus": "ALIVE",
+    },
+    "220719900003": {
+        "nationalId": "220719900003",
+        "firstName": "Lineo",
+        "surname": "Ramakatane",
+        "dateOfBirth": "1990-07-22",
+        "sex": "F",
+        "district": "Berea",
+        "village": "Teyateyaneng",
+        "citizenship": "LS",
+        "vitalStatus": "ALIVE",
+    },
+    "050519500004": {
+        "nationalId": "050519500004",
+        "firstName": "Teboho",
+        "surname": "Mofokeng",
+        "dateOfBirth": "1950-05-05",
+        "sex": "M",
+        "district": "Mafeteng",
+        "village": "Ha Mohlalefi",
+        "citizenship": "LS",
+        "vitalStatus": "DECEASED",
+        "dateOfDeath": "2025-11-30",
+    },
+    "301119520005": {
+        "nationalId": "301119520005",
+        "firstName": "'Mamello",
+        "surname": "Sekhesa",
+        "dateOfBirth": "1952-11-30",
+        "sex": "F",
+        "district": "Mohale's Hoek",
+        "village": "Ha Ramarothole",
+        "citizenship": "LS",
+        "vitalStatus": "ALIVE",
+    },
+    "090820150006": {
+        "nationalId": "090820150006",
+        "firstName": "Neo",
+        "surname": "Khoarai",
+        "dateOfBirth": "2015-08-09",
+        "sex": "M",
+        "district": "Quthing",
+        "village": "Moyeni",
+        "citizenship": "LS",
+        "vitalStatus": "ALIVE",
+    },
+}

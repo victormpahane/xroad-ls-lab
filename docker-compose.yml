@@ -1,0 +1,199 @@
+# X-Road local lab: Lesotho government data exchange (LS-DEV)
+#
+# Based on the NIIS Knowledge Base guide "How to Set Up a Local Test
+# Environment Using Docker Compose" (X-Road 7.7.0), extended with two
+# information systems:
+#
+#   mosd-portal   (consumer IS) Ministry of Social Development Grants Portal
+#                 LS-DEV/GOV/MOSD/GRANTS-PORTAL          -> uses ss2
+#   moha-registry (provider IS) Ministry of Home Affairs Population Registry
+#                 LS-DEV/GOV/MOHA/POPULATION-REGISTRY    -> behind ss3
+#
+# Networks model a real deployment:
+#   xroad-network  the shared "X-Road network": cs, ca and all Security Servers
+#   mosd-lan       MOSD's internal network: only ss2 and the portal
+#   moha-lan       MOHA's internal network: only ss3 and the registry
+# The portal cannot reach the registry directly; it must go through ss2 -> ss3.
+#
+# Host ports (bound to 127.0.0.1: reachable only from this laptop.
+# Docker publishes ports past ufw, so binding to loopback is what keeps
+# the admin UIs and their default xrd/secret login off your Wi-Fi.)
+#   4000        Central Server admin UI         https://cs.lab:4000
+#   8888        Test CA (signing UI + OCSP)     http://localhost:8888/testca/
+#   1000/2000/3000  ss1/ss2/ss3 admin UI        https://ss1.lab:1000 etc.
+#               (cs.lab / ssN.lab are /etc/hosts aliases for 127.0.0.1; see README)
+#   1080/2080/3080  ss1/ss2/ss3 consumer HTTP   (1443/2443/3443 for HTTPS)
+#   8500        MOSD Grants Portal              http://localhost:8500
+#   8001        MOHA registry audit/docs        http://localhost:8001/audit
+#
+# Admin login for cs and all Security Servers: xrd / secret
+# Token PIN everywhere: 123456xrd!
+
+services:
+  cs:
+    image: niis/xroad-central-server:noble-7.7.0
+    container_name: cs
+    environment:
+      XROAD_TOKEN_PIN: 123456xrd!
+    ports:
+      - 127.0.0.1:4000:4000
+    volumes:
+      - cs-db-volume:/var/lib/postgresql/16/main
+      - cs-conf-volume:/etc/xroad
+    networks:
+      - xroad-network
+
+  ca:
+    image: ghcr.io/nordic-institute/xrddev-testca:latest
+    container_name: ca
+    ports:
+      - 127.0.0.1:8888:8888
+    volumes:
+      - ca-volume:/home/ca
+    networks:
+      - xroad-network
+
+  # Management Security Server, owned by the X-Road operator (MCST)
+  ss1:
+    image: niis/xroad-security-server-sidecar:7.7.0
+    container_name: ss1
+    ports:
+      - 127.0.0.1:1000:4000
+      - 127.0.0.1:1080:8080
+      - 127.0.0.1:1443:8443
+    environment:
+      XROAD_TOKEN_PIN: 123456xrd!
+      XROAD_ADMIN_USER: xrd
+      XROAD_ADMIN_PASSWORD: secret
+      XROAD_LOG_LEVEL: INFO
+    volumes:
+      - ss1-db-volume:/var/lib/postgresql/16/main
+      - ss1-conf-volume:/etc/xroad
+      - ss1-archive-volume:/var/lib/xroad
+    networks:
+      - xroad-network
+    depends_on:
+      - cs
+      - ca
+
+  # Consumer Security Server, owned by MOSD
+  ss2:
+    image: niis/xroad-security-server-sidecar:7.7.0
+    container_name: ss2
+    ports:
+      - 127.0.0.1:2000:4000
+      - 127.0.0.1:2080:8080
+      - 127.0.0.1:2443:8443
+    environment:
+      XROAD_TOKEN_PIN: 123456xrd!
+      XROAD_ADMIN_USER: xrd
+      XROAD_ADMIN_PASSWORD: secret
+      XROAD_LOG_LEVEL: INFO
+    volumes:
+      - ss2-db-volume:/var/lib/postgresql/16/main
+      - ss2-conf-volume:/etc/xroad
+      - ss2-archive-volume:/var/lib/xroad
+    networks:
+      - xroad-network
+      - mosd-lan
+    depends_on:
+      - cs
+      - ca
+
+  # Provider Security Server, owned by MOHA
+  ss3:
+    image: niis/xroad-security-server-sidecar:7.7.0
+    container_name: ss3
+    ports:
+      - 127.0.0.1:3000:4000
+      - 127.0.0.1:3080:8080
+      - 127.0.0.1:3443:8443
+    environment:
+      XROAD_TOKEN_PIN: 123456xrd!
+      XROAD_ADMIN_USER: xrd
+      XROAD_ADMIN_PASSWORD: secret
+      XROAD_LOG_LEVEL: INFO
+    volumes:
+      - ss3-db-volume:/var/lib/postgresql/16/main
+      - ss3-conf-volume:/etc/xroad
+      - ss3-archive-volume:/var/lib/xroad
+    networks:
+      - xroad-network
+      - moha-lan
+    depends_on:
+      - cs
+      - ca
+
+  # ---------------------------------------------------------------------------
+  # Information systems
+  # ---------------------------------------------------------------------------
+
+  # Provider IS: REST (OpenAPI 3) + SOAP (WSDL) population registry
+  moha-registry:
+    build: ./moha-registry
+    image: ls-lab/moha-registry:1.0
+    container_name: moha-registry
+    ports:
+      # Only so you can open /audit and /docs from your browser.
+      # In production a provider IS is never exposed like this.
+      - 127.0.0.1:8001:8000
+    networks:
+      - moha-lan
+    restart: unless-stopped
+
+  # Consumer IS: grants officer web app
+  mosd-portal:
+    build: ./mosd-portal
+    image: ls-lab/mosd-portal:1.0
+    container_name: mosd-portal
+    environment:
+      XROAD_SS_URL: http://ss2:8080
+      XROAD_CLIENT: LS-DEV/GOV/MOSD/GRANTS-PORTAL
+      XROAD_PROVIDER: LS-DEV/GOV/MOHA/POPULATION-REGISTRY
+      XROAD_REST_SERVICE: population-api
+      XROAD_SOAP_SERVICE: verifyIdentity
+      XROAD_SOAP_VERSION: v1
+    ports:
+      - 127.0.0.1:8500:8000
+    networks:
+      - mosd-lan
+    depends_on:
+      - ss2
+    restart: unless-stopped
+
+volumes:
+  cs-db-volume:
+    name: cs-db-data
+  cs-conf-volume:
+    name: cs-conf-data
+  ca-volume:
+    name: ca-data
+  ss1-db-volume:
+    name: ss1-db-data
+  ss1-conf-volume:
+    name: ss1-conf-data
+  ss1-archive-volume:
+    name: ss1-archive-data
+  ss2-db-volume:
+    name: ss2-db-data
+  ss2-conf-volume:
+    name: ss2-conf-data
+  ss2-archive-volume:
+    name: ss2-archive-data
+  ss3-db-volume:
+    name: ss3-db-data
+  ss3-conf-volume:
+    name: ss3-conf-data
+  ss3-archive-volume:
+    name: ss3-archive-data
+
+networks:
+  xroad-network:
+    name: xroad-network
+    driver: bridge
+  mosd-lan:
+    name: mosd-lan
+    driver: bridge
+  moha-lan:
+    name: moha-lan
+    driver: bridge

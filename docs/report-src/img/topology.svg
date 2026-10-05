@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1F3A5F"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#B23A3A"/></marker>
+  </defs>
+  <rect width="1400" height="860" fill="#ffffff"/>
+  <!-- laptop -->
+  <rect x="20" y="20" width="1360" height="820" rx="18" fill="#F7F8FA" stroke="#5B6573" stroke-width="2"/>
+  <text x="44" y="58" font-size="24" font-weight="bold" fill="#1F2933">Your laptop: Ubuntu 26.04 + Docker Engine</text>
+  <text x="44" y="88" font-size="17" fill="#4A5563">Browser and terminal reach the containers only through ports published on 127.0.0.1 (shown in each box)</text>
+
+  <!-- xroad-network -->
+  <rect x="50" y="120" width="1300" height="400" rx="14" fill="#E3EEF9" fill-opacity="0.85" stroke="#2B5F96" stroke-width="2.5" stroke-dasharray="10 6"/>
+  <text x="70" y="152" font-size="20" font-weight="bold" fill="#2B5F96">xroad-network  (the shared X-Road network)</text>
+
+  <!-- mosd-lan -->
+  <rect x="50" y="450" width="620" height="370" rx="14" fill="#E4F4EC" fill-opacity="0.75" stroke="#2E7D55" stroke-width="2.5" stroke-dasharray="10 6"/>
+  <text x="70" y="800" font-size="20" font-weight="bold" fill="#2E7D55">mosd-lan  (MOSD's internal network)</text>
+  <!-- moha-lan -->
+  <rect x="730" y="450" width="620" height="370" rx="14" fill="#FBEFE2" fill-opacity="0.75" stroke="#B5651D" stroke-width="2.5" stroke-dasharray="10 6"/>
+  <text x="750" y="800" font-size="20" font-weight="bold" fill="#B5651D">moha-lan  (MOHA's internal network)</text>
+
+  <!-- top row: cs, ca, ss1 -->
+  <g>
+    <rect x="90" y="180" width="330" height="140" rx="10" fill="#fff" stroke="#1F3A5F" stroke-width="2"/>
+    <text x="110" y="214" font-size="22" font-weight="bold" fill="#1F3A5F">cs  Central Server</text>
+    <text x="110" y="244" font-size="16" fill="#333">Member list + global configuration</text>
+    <text x="110" y="270" font-size="16" fill="#333">Owner: X-Road operator (MCST)</text>
+    <text x="110" y="300" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">UI https://cs.lab:4000</text>
+  </g>
+  <g>
+    <rect x="535" y="180" width="330" height="140" rx="10" fill="#fff" stroke="#1F3A5F" stroke-width="2"/>
+    <text x="555" y="214" font-size="20" font-weight="bold" fill="#1F3A5F">ca  Test CA + OCSP + TSA</text>
+    <text x="555" y="244" font-size="16" fill="#333">Issues and checks certificates,</text>
+    <text x="555" y="270" font-size="16" fill="#333">stamps time (OCSP :8888, TSA :8899)</text>
+    <text x="555" y="300" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">http://localhost:8888/testca/</text>
+  </g>
+  <g>
+    <rect x="980" y="180" width="330" height="140" rx="10" fill="#fff" stroke="#1F3A5F" stroke-width="2"/>
+    <text x="1000" y="214" font-size="22" font-weight="bold" fill="#1F3A5F">ss1  Management SS</text>
+    <text x="1000" y="244" font-size="16" fill="#333">Owner GOV/MCST, code SS1</text>
+    <text x="1000" y="270" font-size="16" fill="#333">Hosts MCST/MANAGEMENT services</text>
+    <text x="1000" y="300" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">UI https://ss1.lab:1000</text>
+  </g>
+
+  <!-- ss2, ss3 straddling -->
+  <g>
+    <rect x="300" y="390" width="330" height="140" rx="10" fill="#fff" stroke="#2E7D55" stroke-width="3"/>
+    <text x="320" y="424" font-size="22" font-weight="bold" fill="#2E7D55">ss2  Consumer SS</text>
+    <text x="320" y="454" font-size="16" fill="#333">Owner GOV/MOSD, code SS2</text>
+    <text x="320" y="480" font-size="16" fill="#333">Client: MOSD/GRANTS-PORTAL</text>
+    <text x="320" y="510" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">UI ss2.lab:2000 · IS :2080</text>
+  </g>
+  <g>
+    <rect x="770" y="390" width="330" height="140" rx="10" fill="#fff" stroke="#B5651D" stroke-width="3"/>
+    <text x="790" y="424" font-size="22" font-weight="bold" fill="#B5651D">ss3  Provider SS</text>
+    <text x="790" y="454" font-size="16" fill="#333">Owner GOV/MOHA, code SS3</text>
+    <text x="790" y="480" font-size="16" fill="#333">Client: MOHA/POPULATION-REGISTRY</text>
+    <text x="790" y="510" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">UI ss3.lab:3000 · IS :3080</text>
+  </g>
+
+  <!-- IS boxes -->
+  <g>
+    <rect x="300" y="630" width="330" height="120" rx="10" fill="#fff" stroke="#2E7D55" stroke-width="2"/>
+    <text x="320" y="664" font-size="22" font-weight="bold" fill="#2E7D55">mosd-portal</text>
+    <text x="320" y="694" font-size="16" fill="#333">Grants Portal (consumer IS)</text>
+    <text x="320" y="724" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">http://localhost:8500</text>
+  </g>
+  <g>
+    <rect x="770" y="630" width="330" height="120" rx="10" fill="#fff" stroke="#B5651D" stroke-width="2"/>
+    <text x="790" y="664" font-size="22" font-weight="bold" fill="#B5651D">moha-registry</text>
+    <text x="790" y="694" font-size="16" fill="#333">Population Registry (provider IS)</text>
+    <text x="790" y="724" font-size="16" fill="#2B5F96" font-family="DejaVu Sans Mono, monospace">http://localhost:8001/audit</text>
+  </g>
+
+  <!-- arrows -->
+  <line x1="465" y1="628" x2="465" y2="536" stroke="#1F3A5F" stroke-width="3" marker-end="url(#a)"/>
+  <text x="475" y="590" font-size="15" fill="#1F3A5F">HTTP to ss2:8080</text>
+  <line x1="636" y1="460" x2="762" y2="460" stroke="#1F3A5F" stroke-width="4" marker-end="url(#a)" marker-start="url(#a)"/>
+  <text x="640" y="445" font-size="15" font-weight="bold" fill="#1F3A5F">mutual TLS</text>
+  <line x1="935" y1="536" x2="935" y2="628" stroke="#1F3A5F" stroke-width="3" marker-end="url(#a)"/>
+  <text x="945" y="590" font-size="15" fill="#1F3A5F">HTTP to moha-registry:8000</text>
+  <!-- no bypass -->
+  <path d="M630 700 L766 700" stroke="#B23A3A" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#r)"/>
+  <text x="650" y="688" font-size="15" font-weight="bold" fill="#B23A3A">no route</text>
+  <text x="684" y="712" font-size="26" font-weight="bold" fill="#B23A3A">✕</text>
+</svg>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:xrd="http://x-road.eu/xsd/xroad.xsd"
+                  xmlns:id="http://x-road.eu/xsd/identifiers"
+                  xmlns:pop="http://moha.gov.ls/population">
+  <soapenv:Header>
+    <xrd:client id:objectType="SUBSYSTEM">
+      <id:xRoadInstance>LS-DEV</id:xRoadInstance>
+      <id:memberClass>GOV</id:memberClass>
+      <id:memberCode>MOSD</id:memberCode>
+      <id:subsystemCode>GRANTS-PORTAL</id:subsystemCode>
+    </xrd:client>
+    <xrd:service id:objectType="SERVICE">
+      <id:xRoadInstance>LS-DEV</id:xRoadInstance>
+      <id:memberClass>GOV</id:memberClass>
+      <id:memberCode>MOHA</id:memberCode>
+      <id:subsystemCode>POPULATION-REGISTRY</id:subsystemCode>
+      <id:serviceCode>verifyIdentity</id:serviceCode>
+      <id:serviceVersion>v1</id:serviceVersion>
+    </xrd:service>
+    <xrd:id>curl-test-0001</xrd:id>
+    <xrd:userId>curl</xrd:userId>
+    <xrd:protocolVersion>4.0</xrd:protocolVersion>
+  </soapenv:Header>
+  <soapenv:Body>
+    <pop:verifyIdentity>
+      <pop:nationalId>150319480002</pop:nationalId>
+      <pop:firstName>Thabo</pop:firstName>
+      <pop:surname>Letsie</pop:surname>
+      <pop:dateOfBirth>1948-03-15</pop:dateOfBirth>
+    </pop:verifyIdentity>
+  </soapenv:Body>
+</soapenv:Envelope>

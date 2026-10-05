@@ -1,0 +1,16 @@
+# Generated per lab build: regenerate with scripts/fetch-ca-certs.sh
+certs/*.pem
+certs/*.crt
+
+# Editors and office lock files
+*.swp
+*~
+.~lock.*#
+
+# Python
+__pycache__/
+*.pyc
+
+# Document generator: install with `npm install` in docs/report-src
+node_modules/
+docs/report-src/render/

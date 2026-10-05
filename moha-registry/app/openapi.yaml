@@ -1,0 +1,85 @@
+openapi: 3.0.3
+info:
+  title: MOHA Population Registry API
+  version: "1.0.0"
+  description: >
+    Citizen lookup published to X-Road by the Ministry of Home Affairs
+    (LS-DEV/GOV/MOHA/POPULATION-REGISTRY). The Security Server uses
+    servers[0].url as the service URL and turns each path below into an
+    endpoint that access rights can be granted on.
+servers:
+  # ss3 forwards X-Road requests to this address on the Docker network.
+  - url: http://moha-registry:8000/api
+paths:
+  /citizens/{nationalId}:
+    get:
+      operationId: getCitizen
+      summary: Full citizen record
+      parameters:
+        - $ref: "#/components/parameters/NationalId"
+      responses:
+        "200":
+          description: Citizen found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Citizen"
+        "404":
+          description: No citizen with this national ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /citizens/{nationalId}/vital-status:
+    get:
+      operationId: getVitalStatus
+      summary: Alive/deceased status only (minimal disclosure)
+      parameters:
+        - $ref: "#/components/parameters/NationalId"
+      responses:
+        "200":
+          description: Status found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VitalStatus"
+        "404":
+          description: No citizen with this national ID
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  parameters:
+    NationalId:
+      name: nationalId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[0-9]{12}$"
+  schemas:
+    Citizen:
+      type: object
+      properties:
+        nationalId: {type: string}
+        firstName: {type: string}
+        surname: {type: string}
+        dateOfBirth: {type: string, format: date}
+        sex: {type: string, enum: [F, M]}
+        district: {type: string}
+        village: {type: string}
+        citizenship: {type: string}
+        vitalStatus: {type: string, enum: [ALIVE, DECEASED]}
+        dateOfDeath: {type: string, format: date}
+    VitalStatus:
+      type: object
+      properties:
+        nationalId: {type: string}
+        vitalStatus: {type: string, enum: [ALIVE, DECEASED]}
+        dateOfDeath: {type: string, format: date}
+    Error:
+      type: object
+      properties:
+        error: {type: string}
+        message: {type: string}

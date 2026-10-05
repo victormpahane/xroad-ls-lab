@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MOSD Grants Portal</title>
+  <link rel="stylesheet" href="/static/portal.css">
+</head>
+<body>
+<header class="top">
+  <div class="flag"><span></span><span></span><span></span></div>
+  <div class="brand">
+    <div class="ministry">Ministry of Social Development</div>
+    <h1>Grants Portal · Old Age Pension intake</h1>
+  </div>
+  <div class="ident">
+    <div><span>This system</span><code>{{ client_id }}</code></div>
+    <div><span>Talks only to</span><code>{{ ss_url }}</code></div>
+  </div>
+</header>
+
+<main>
+  <section class="card form-card">
+    <h2>Applicant</h2>
+    <form method="post" action="/check">
+      <div class="grid">
+        <label>National ID<input name="national_id" value="{{ form.national_id }}" required pattern="[0-9]{12}" placeholder="12 digits"></label>
+        <label>Date of birth<input name="dob" type="date" value="{{ form.dob }}"></label>
+        <label>First name<input name="first_name" value="{{ form.first_name }}"></label>
+        <label>Surname<input name="surname" value="{{ form.surname }}"></label>
+        <label>Officer (X-Road userId)<input name="officer" value="{{ form.officer }}"></label>
+      </div>
+      <div class="actions">
+        <button name="action" value="pension" class="primary">Check pension eligibility</button>
+        <button name="action" value="verify">Verify identity <small>SOAP</small></button>
+        <button name="action" value="lookup">Look up record <small>REST</small></button>
+        <button name="action" value="status">Vital status only <small>REST</small></button>
+      </div>
+    </form>
+    <details class="samples">
+      <summary>Sample applicants (synthetic data)</summary>
+      <table>
+        <tr><th>National ID</th><th>Name</th><th>DOB</th><th>Expected</th><th></th></tr>
+        {% for nid, fn, sn, dob, expected in samples %}
+        <tr>
+          <td><code>{{ nid }}</code></td><td>{{ fn }} {{ sn }}</td><td>{{ dob }}</td><td>{{ expected }}</td>
+          <td><button type="button" class="link" onclick="fill('{{ nid }}','{{ fn|replace("'", "\\'") }}','{{ sn }}','{{ dob }}')">Use</button></td>
+        </tr>
+        {% endfor %}
+      </table>
+    </details>
+  </section>
+
+  {% if assessment %}
+  <section class="card verdict {{ assessment.decision|lower }}">
+    <div class="verdict-head">
+      <span class="badge">{{ assessment.decision }}</span>
+      <h2>{{ assessment.title }}</h2>
+    </div>
+    <ul class="reasons">
+      {% for ok, text in assessment.reasons %}
+      <li class="{{ 'ok' if ok else 'bad' }}">{{ '✓' if ok else '✗' }} {{ text }}</li>
+      {% endfor %}
+    </ul>
+    <p class="note">Rule used: alive, Lesotho citizen, aged {{ 70 }}+, identity details match. Demo rule for the lab.</p>
+  </section>
+  {% endif %}
+
+  {% if verify and action == 'verify' %}
+  <section class="card result">
+    <h2>Identity verification <small>from MOHA via SOAP</small></h2>
+    <dl>
+      <dt>Found in register</dt><dd>{{ 'Yes' if verify.found else 'No' }}</dd>
+      <dt>Details match</dt><dd>{{ 'Yes' if verify.match else 'No' }}{% if verify.mismatchedFields %} – mismatched: {{ verify.mismatchedFields|join(', ') }}{% endif %}</dd>
+      {% if verify.vitalStatus %}<dt>Vital status</dt><dd>{{ verify.vitalStatus }}</dd>{% endif %}
+    </dl>
+  </section>
+  {% endif %}
+
+  {% if citizen %}
+  <section class="card result">
+    <h2>Citizen record <small>from MOHA via REST</small></h2>
+    <dl>
+      <dt>Name</dt><dd>{{ citizen.firstName }} {{ citizen.surname }}</dd>
+      <dt>Date of birth</dt><dd>{{ citizen.dateOfBirth }}</dd>
+      <dt>Sex</dt><dd>{{ citizen.sex }}</dd>
+      <dt>District / village</dt><dd>{{ citizen.district }} · {{ citizen.village }}</dd>
+      <dt>Citizenship</dt><dd>{{ citizen.citizenship }}</dd>
+      <dt>Vital status</dt><dd>{{ citizen.vitalStatus }}{% if citizen.dateOfDeath %} ({{ citizen.dateOfDeath }}){% endif %}</dd>
+    </dl>
+  </section>
+  {% endif %}
+
+  {% if status %}
+  <section class="card result">
+    <h2>Vital status <small>minimal-disclosure endpoint</small></h2>
+    <dl><dt>Status</dt><dd>{{ status.vitalStatus }}{% if status.dateOfDeath %} ({{ status.dateOfDeath }}){% endif %}</dd></dl>
+  </section>
+  {% endif %}
+
+  {% if not_found and not assessment %}
+  <section class="card result"><h2>Not found</h2><p>MOHA has no citizen with national ID <code>{{ form.national_id }}</code>.</p></section>
+  {% endif %}
+
+  {% if traces %}
+  <section class="card">
+    <h2>X-Road trace</h2>
+    <p class="muted">Every call below went portal → <b>ss2</b> → <b>ss3</b> → MOHA registry and back. The X-Road-* response headers were added by the Security Servers.</p>
+    {% for t in traces %}
+    <details class="trace {{ 'ok' if t.ok or (t.status == 404 and not t.error) else 'bad' }}" {% if not t.ok %}open{% endif %}>
+      <summary>
+        <span class="tlabel">{{ t.label }}</span>
+        <span class="tstatus">{{ t.status or 'no response' }}</span>
+        <span class="tms">{{ t.elapsed_ms }} ms</span>
+      </summary>
+      {% if t.error %}<div class="err"><b>{{ t.error }}</b>{% if t.hint %}<div class="hint">Fix: {{ t.hint }}</div>{% endif %}</div>{% endif %}
+      <h4>Request</h4>
+      <pre>{{ t.method }} {{ t.url }}
+{% for k, v in t.request_headers.items() %}{{ k }}: {{ v }}
+{% endfor %}{% if t.request_body %}
+{{ t.request_body }}{% endif %}</pre>
+      {% if t.status %}
+      <h4>Response headers added by X-Road</h4>
+      <pre>{% for k, v in t.xroad_response_headers.items() %}{{ k }}: {{ v }}
+{% else %}(none){% endfor %}</pre>
+      <h4>Response body</h4>
+      <pre>{{ t.response_body }}</pre>
+      {% endif %}
+    </details>
+    {% endfor %}
+  </section>
+  {% endif %}
+</main>
+
+<footer>
+  Provider: <code>{{ provider_id }}</code> · REST service <code>{{ rest_service }}</code> · SOAP service <code>{{ soap_service }}</code>
+</footer>
+
+<script>
+function fill(nid, fn, sn, dob) {
+  const f = document.forms[0];
+  f.national_id.value = nid; f.first_name.value = fn; f.surname.value = sn; f.dob.value = dob;
+  f.national_id.focus();
+}
+</script>
+</body>
+</html>

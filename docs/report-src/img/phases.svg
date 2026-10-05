@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="520" viewBox="0 0 1400 520" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5B6573"/></marker></defs>
+  <rect width="1400" height="520" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">The build, phase by phase</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">Each phase depends on the one before it. Each ends with a checkpoint that must pass.</text>
+
+  <!-- row of 7 cards -->
+  <g font-size="16" fill="#333">
+    <!-- P0 -->
+    <rect x="30" y="110" width="176" height="300" rx="12" fill="#F1F3F6" stroke="#5B6573" stroke-width="2"/>
+    <rect x="30" y="110" width="176" height="52" rx="12" fill="#5B6573"/><rect x="30" y="140" width="176" height="22" fill="#5B6573"/>
+    <text x="48" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 0</text>
+    <text x="46" y="192" font-weight="bold">Prepare</text>
+    <text x="46" y="222">Docker, host</text><text x="46" y="244">names, clock,</text><text x="46" y="266">preflight,</text><text x="46" y="288">compose up</text>
+    <text x="46" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ 7 containers Up</text>
+
+    <!-- P1 -->
+    <rect x="226" y="110" width="176" height="300" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <rect x="226" y="110" width="176" height="52" rx="12" fill="#2B5F96"/><rect x="226" y="140" width="176" height="22" fill="#2B5F96"/>
+    <text x="244" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 1</text>
+    <text x="242" y="192" font-weight="bold">Central Server</text>
+    <text x="242" y="222">Instance LS-DEV,</text><text x="242" y="244">CA, OCSP, TSA,</text><text x="242" y="266">3 members,</text><text x="242" y="288">signing keys,</text><text x="242" y="310">anchor</text>
+    <text x="242" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ no alerts, anchor</text>
+
+    <!-- P2 -->
+    <rect x="422" y="110" width="176" height="300" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <rect x="422" y="110" width="176" height="52" rx="12" fill="#2B5F96"/><rect x="422" y="140" width="176" height="22" fill="#2B5F96"/>
+    <text x="440" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 2</text>
+    <text x="438" y="192" font-weight="bold">ss1 (MCST)</text>
+    <text x="438" y="222">Init, 2 certs,</text><text x="438" y="244">register,</text><text x="438" y="266">MANAGEMENT</text><text x="438" y="288">subsystem and</text><text x="438" y="310">its services</text>
+    <text x="438" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ MANAGEMENT</text><text x="438" y="398" font-size="14" fill="#2E7D55" font-weight="bold">   REGISTERED</text>
+
+    <!-- P3 -->
+    <rect x="618" y="110" width="176" height="300" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <rect x="618" y="110" width="176" height="52" rx="12" fill="#2B5F96"/><rect x="618" y="140" width="176" height="22" fill="#2B5F96"/>
+    <text x="636" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 3</text>
+    <text x="634" y="192" font-weight="bold">ss2 + ss3</text>
+    <text x="634" y="222">Same as ss1,</text><text x="634" y="244">owners MOSD</text><text x="634" y="266">and MOHA;</text><text x="634" y="288">requests go</text><text x="634" y="310">via ss1</text>
+    <text x="634" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ both owners</text><text x="634" y="398" font-size="14" fill="#2E7D55" font-weight="bold">   REGISTERED</text>
+
+    <!-- P4 -->
+    <rect x="814" y="110" width="176" height="300" rx="12" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2"/>
+    <rect x="814" y="110" width="176" height="52" rx="12" fill="#2E7D55"/><rect x="814" y="140" width="176" height="22" fill="#2E7D55"/>
+    <text x="832" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 4</text>
+    <text x="830" y="192" font-weight="bold">IS subsystems</text>
+    <text x="830" y="222">GRANTS-PORTAL</text><text x="830" y="244">on ss2, POPU-</text><text x="830" y="266">LATION-REGISTRY</text><text x="830" y="288">on ss3; HTTP</text><text x="830" y="310">connection</text>
+    <text x="830" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ both REGISTERED</text>
+
+    <!-- P5 -->
+    <rect x="1010" y="110" width="176" height="300" rx="12" fill="#FBEFE2" stroke="#B5651D" stroke-width="2"/>
+    <rect x="1010" y="110" width="176" height="52" rx="12" fill="#B5651D"/><rect x="1010" y="140" width="176" height="22" fill="#B5651D"/>
+    <text x="1028" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 5</text>
+    <text x="1026" y="192" font-weight="bold">Services</text>
+    <text x="1026" y="222">REST + SOAP</text><text x="1026" y="244">published on</text><text x="1026" y="266">ss3, access</text><text x="1026" y="288">for GRANTS-</text><text x="1026" y="310">PORTAL</text>
+    <text x="1026" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ allowedMethods</text>
+
+    <!-- P6 -->
+    <rect x="1206" y="110" width="164" height="300" rx="12" fill="#FFF7D6" stroke="#9A7B00" stroke-width="2"/>
+    <rect x="1206" y="110" width="164" height="52" rx="12" fill="#9A7B00"/><rect x="1206" y="140" width="164" height="22" fill="#9A7B00"/>
+    <text x="1224" y="145" font-size="21" font-weight="bold" fill="#fff">Phase 6</text>
+    <text x="1222" y="192" font-weight="bold">Test</text>
+    <text x="1222" y="222">Portal, audit</text><text x="1222" y="244">page, smoke</text><text x="1222" y="266">test, curl</text>
+    <text x="1222" y="380" font-size="14" fill="#2E7D55" font-weight="bold">✓ 7/7 passed</text>
+  </g>
+  <!-- arrows -->
+  <g stroke="#5B6573" stroke-width="3" marker-end="url(#a)">
+    <line x1="207" y1="260" x2="223" y2="260"/><line x1="403" y1="260" x2="419" y2="260"/><line x1="599" y1="260" x2="615" y2="260"/>
+    <line x1="795" y1="260" x2="811" y2="260"/><line x1="991" y1="260" x2="1007" y2="260"/><line x1="1187" y1="260" x2="1203" y2="260"/>
+  </g>
+  <text x="30" y="460" font-size="17" fill="#4A5563">Blue: X-Road infrastructure · Green: consumer side (MOSD) · Orange: provider side (MOHA) · Yellow: verification</text>
+  <text x="30" y="490" font-size="17" fill="#4A5563">All phases were completed in one session on 2 October 2026.</text>
+</svg>

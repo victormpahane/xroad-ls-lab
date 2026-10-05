@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="600" viewBox="0 0 1400 600" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1F3A5F"/></marker>
+    <marker id="y" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9A7B00"/></marker>
+  </defs>
+  <rect width="1400" height="600" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">How ss2 and ss3 register: through ss1's management services</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">Phases 3 and 4. This was the first real X-Road message on the network, and it is why ss1 had to be finished first.</text>
+
+  <rect x="40" y="130" width="300" height="170" rx="12" fill="#fff" stroke="#2E7D55" stroke-width="3"/>
+  <text x="60" y="166" font-size="22" font-weight="bold" fill="#2E7D55">ss2 (or ss3)</text>
+  <text x="60" y="198" font-size="16" fill="#333">Admin presses Register</text>
+  <text x="60" y="222" font-size="16" fill="#333">on the auth certificate or</text>
+  <text x="60" y="246" font-size="16" fill="#333">on a new subsystem</text>
+
+  <rect x="550" y="130" width="300" height="170" rx="12" fill="#fff" stroke="#1F3A5F" stroke-width="3"/>
+  <text x="570" y="166" font-size="22" font-weight="bold" fill="#1F3A5F">ss1</text>
+  <text x="570" y="198" font-size="16" fill="#333">Client MCST/MANAGEMENT</text>
+  <text x="570" y="222" font-size="16" fill="#333">checks: is the caller in</text>
+  <text x="570" y="246" font-size="16" fill="#333">security-server-owners?</text>
+  <text x="570" y="276" font-size="14" fill="#B23A3A">needs the Phase 2 fixes (8d–8f)</text>
+
+  <rect x="1060" y="130" width="300" height="170" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="3"/>
+  <text x="1080" y="166" font-size="22" font-weight="bold" fill="#2B5F96">cs</text>
+  <text x="1080" y="198" font-size="16" fill="#333">Management service</text>
+  <text x="1080" y="222" font-size="16" fill="#333">stores the request:</text>
+  <text x="1080" y="246" font-size="16" fill="#333" font-weight="bold">status WAITING</text>
+
+  <line x1="342" y1="190" x2="546" y2="190" stroke="#1F3A5F" stroke-width="4" marker-end="url(#a)"/>
+  <text x="360" y="176" font-size="15" fill="#1F3A5F" font-weight="bold">X-Road message</text>
+  <text x="360" y="214" font-size="14" fill="#1F3A5F">service clientReg /</text>
+  <text x="360" y="234" font-size="14" fill="#1F3A5F">authCertReg, mutual TLS</text>
+  <line x1="852" y1="190" x2="1056" y2="190" stroke="#1F3A5F" stroke-width="4" marker-end="url(#a)"/>
+  <text x="866" y="176" font-size="15" fill="#1F3A5F" font-weight="bold">HTTPS</text>
+  <text x="866" y="214" font-size="14" fill="#1F3A5F" font-family="DejaVu Sans Mono, monospace">to cs port 4002</text>
+
+  <rect x="1060" y="370" width="300" height="110" rx="12" fill="#FFF7D6" stroke="#9A7B00" stroke-width="2.5"/>
+  <text x="1080" y="404" font-size="20" font-weight="bold" fill="#7A6100">Operator approves</text>
+  <text x="1080" y="434" font-size="16" fill="#333">cs UI → Management</text>
+  <text x="1080" y="458" font-size="16" fill="#333">Requests → Approve</text>
+  <line x1="1210" y1="302" x2="1210" y2="366" stroke="#9A7B00" stroke-width="3" marker-end="url(#y)"/>
+
+  <rect x="40" y="370" width="810" height="110" rx="12" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2.5"/>
+  <text x="60" y="404" font-size="20" font-weight="bold" fill="#2E7D55">Next global configuration includes the change</text>
+  <text x="60" y="434" font-size="16" fill="#333">Every Security Server downloads it within about a minute; ss2's status flips to REGISTERED.</text>
+  <text x="60" y="458" font-size="16" fill="#333">Measured: ~90 s for the ss2/ss3 owners, ~70 s for the two IS subsystems.</text>
+  <line x1="1058" y1="425" x2="854" y2="425" stroke="#9A7B00" stroke-width="3" marker-end="url(#y)"/>
+
+  <rect x="40" y="510" width="1320" height="70" rx="10" fill="#F7F8FA" stroke="#C9CFD8"/>
+  <text x="60" y="540" font-size="16" fill="#1F2933"><tspan font-weight="bold">Exception, ss1 itself (Phase 2):</tspan> its own auth certificate goes straight to cs, and MANAGEMENT</text>
+  <text x="60" y="564" font-size="16" fill="#1F2933">is registered from the cs side ("Management Services Security Server = SS1"), because nobody can provide management services yet.</text>
+</svg>

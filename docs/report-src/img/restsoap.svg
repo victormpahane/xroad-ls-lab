@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" font-family="DejaVu Sans, Arial, sans-serif">
+  <rect width="1400" height="760" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">Same journey, two envelopes: where "who" and "what" travel</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">Both go portal → ss2 → ss3 → registry, signed, over mutual TLS, access-checked and logged. Only the packaging differs.</text>
+
+  <!-- REST -->
+  <rect x="30" y="100" width="655" height="560" rx="14" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2.5"/>
+  <text x="50" y="136" font-size="22" font-weight="bold" fill="#2E7D55">REST · population-api</text>
+  <rect x="50" y="155" width="615" height="160" rx="8" fill="#fff" stroke="#9AA5B1"/>
+  <g font-family="DejaVu Sans Mono, monospace" font-size="14.5" fill="#1F2933">
+    <text x="64" y="183">GET http://ss2:8080</text>
+    <text x="64" y="207"><tspan fill="#2B5F96" font-weight="bold">/r1/LS-DEV/GOV/MOHA/POPULATION-REGISTRY</tspan></text>
+    <text x="64" y="231"><tspan fill="#B5651D" font-weight="bold">/population-api</tspan><tspan fill="#7A6100">/citizens/150319480002</tspan></text>
+    <text x="64" y="261"><tspan fill="#2E7D55" font-weight="bold">X-Road-Client: LS-DEV/GOV/MOSD/GRANTS-PORTAL</tspan></text>
+    <text x="64" y="285">X-Road-UserId: officer.ntsane</text>
+  </g>
+  <g font-size="15.5" fill="#1F2933">
+    <text x="50" y="340" font-weight="bold">Who is calling?</text><text x="250" y="340">HTTP header X-Road-Client</text>
+    <text x="50" y="370" font-weight="bold">Which provider?</text><text x="250" y="370">in the URL after /r1/</text>
+    <text x="50" y="400" font-weight="bold">Which service?</text><text x="250" y="400">in the URL: population-api</text>
+    <text x="50" y="430" font-weight="bold">Which operation?</text><text x="250" y="430">HTTP method + path (an endpoint)</text>
+    <text x="50" y="460" font-weight="bold">Described by</text><text x="250" y="460">OpenAPI 3 (servers: url, paths)</text>
+    <text x="50" y="490" font-weight="bold">ss3 forwards to</text><text x="250" y="490">http://moha-registry:8000/api + path</text>
+    <text x="50" y="520" font-weight="bold">Access rights</text><text x="250" y="520">per service or per single endpoint</text>
+    <text x="50" y="550" font-weight="bold">X-Road errors</text><text x="250" y="550">X-Road-Error header + JSON "type"</text>
+    <text x="50" y="580" font-weight="bold">Answer</text><text x="250" y="580">JSON: the record, or only the status</text>
+    <text x="50" y="625" fill="#2E7D55" font-weight="bold">Gives the FACTS the pension rule needs</text>
+  </g>
+
+  <!-- SOAP -->
+  <rect x="715" y="100" width="655" height="560" rx="14" fill="#FBEFE2" stroke="#B5651D" stroke-width="2.5"/>
+  <text x="735" y="136" font-size="22" font-weight="bold" fill="#B5651D">SOAP · verifyIdentity v1</text>
+  <rect x="735" y="155" width="615" height="160" rx="8" fill="#fff" stroke="#9AA5B1"/>
+  <g font-family="DejaVu Sans Mono, monospace" font-size="14.5" fill="#1F2933">
+    <text x="749" y="183">POST http://ss2:8080/   (no routing in URL)</text>
+    <text x="749" y="207">&lt;Header&gt; <tspan fill="#2E7D55" font-weight="bold">&lt;xrd:client&gt;</tspan> MOSD/GRANTS-PORTAL</text>
+    <text x="749" y="231">  <tspan fill="#B5651D" font-weight="bold">&lt;xrd:service&gt;</tspan> MOHA/POPULATION-REGISTRY/</text>
+    <text x="749" y="255">             verifyIdentity/v1</text>
+    <text x="749" y="279">  &lt;xrd:id&gt; &lt;xrd:userId&gt; &lt;xrd:protocolVersion&gt;4.0</text>
+    <text x="749" y="303" fill="#7A6100">&lt;Body&gt; &lt;pop:verifyIdentity&gt; id, names, dob</text>
+  </g>
+  <g font-size="15.5" fill="#1F2933">
+    <text x="735" y="340" font-weight="bold">Who is calling?</text><text x="935" y="340">&lt;xrd:client&gt; in the SOAP header</text>
+    <text x="735" y="370" font-weight="bold">Which provider?</text><text x="935" y="370">&lt;xrd:service&gt; in the SOAP header</text>
+    <text x="735" y="400" font-weight="bold">Which service?</text><text x="935" y="400">same element, + version v1</text>
+    <text x="735" y="430" font-weight="bold">Which operation?</text><text x="935" y="430">the body element verifyIdentity</text>
+    <text x="735" y="460" font-weight="bold">Described by</text><text x="935" y="460">WSDL (xrd:version, soap:address)</text>
+    <text x="735" y="490" font-weight="bold">ss3 forwards to</text><text x="935" y="490">http://moha-registry:8000/soap</text>
+    <text x="735" y="520" font-weight="bold">Access rights</text><text x="935" y="520">per service (operation)</text>
+    <text x="735" y="550" font-weight="bold">X-Road errors</text><text x="935" y="550">SOAP Fault: faultcode, faultstring</text>
+    <text x="735" y="580" font-weight="bold">Answer</text><text x="935" y="580">found, match, mismatched fields</text>
+    <text x="735" y="625" fill="#B5651D" font-weight="bold">CONFIRMS identity without disclosing</text>
+  </g>
+
+  <rect x="30" y="680" width="1340" height="60" rx="10" fill="#F7F8FA" stroke="#C9CFD8"/>
+  <text x="50" y="716" font-size="16" fill="#1F2933"><tspan font-weight="bold">Only in SOAP:</tspan> the provider must copy the request's xrd: header back unchanged; ss3 checks it, so answers cannot be swapped.</text>
+</svg>

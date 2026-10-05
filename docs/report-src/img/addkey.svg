@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="700" viewBox="0 0 1400 700" font-family="DejaVu Sans, Arial, sans-serif">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1F3A5F"/></marker></defs>
+  <rect width="1400" height="700" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">The Add key wizard (Keys and certificates → softToken-0 → Add key)</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">You run it twice per Security Server. Values shown for ss1; for ss2/ss3 change the names as in the Phase 3 table.</text>
+
+  <g font-size="15" fill="#1F2933">
+    <rect x="30" y="100" width="300" height="470" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="48" y="134" font-size="19" font-weight="bold" fill="#2B5F96">1  Key details</text>
+    <text x="48" y="172" font-weight="bold">Key label</text>
+    <text x="48" y="196">SIGN run: ss1-sign</text>
+    <text x="48" y="220">AUTH run: ss1-auth</text>
+    <text x="48" y="256" fill="#4A5563">Optional, but a clear</text>
+    <text x="48" y="278" fill="#4A5563">label helps later</text>
+    <text x="48" y="540" font-weight="bold">→ Next</text>
+
+    <rect x="370" y="100" width="330" height="470" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="388" y="134" font-size="19" font-weight="bold" fill="#2B5F96">2  CSR details</text>
+    <text x="388" y="172" font-weight="bold">Usage</text>
+    <text x="388" y="196">SIGNING  or  AUTHENTICATION</text>
+    <text x="388" y="234" font-weight="bold">Client</text>
+    <text x="388" y="258">SIGNING only: GOV:MCST</text>
+    <text x="388" y="296" font-weight="bold">Certification Service</text>
+    <text x="388" y="320">Test CA</text>
+    <text x="388" y="358" font-weight="bold">CSR Format</text>
+    <text x="388" y="382" fill="#B23A3A" font-weight="bold">DER  (not PEM)</text>
+    <text x="388" y="540" font-weight="bold">→ Continue</text>
+
+    <rect x="740" y="100" width="380" height="470" rx="12" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="758" y="134" font-size="19" font-weight="bold" fill="#2B5F96">3  Generate CSR</text>
+    <text x="758" y="172" font-weight="bold">Country Code (C)</text><text x="958" y="172">FI  (read-only)</text>
+    <text x="758" y="206" font-weight="bold">Organization Name (O)</text>
+    <text x="758" y="230">Ministry of Communications</text>
+    <text x="758" y="252">Science and Technology</text>
+    <text x="758" y="276" fill="#B23A3A" font-weight="bold">no comma!</text>
+    <text x="758" y="312" font-weight="bold">CN</text><text x="800" y="312">SIGN: Member Code (CN) = MCST</text>
+    <text x="800" y="334">(read-only)</text>
+    <text x="800" y="358">AUTH: Server DNS Name (CN) = ss1</text>
+    <text x="758" y="394" font-weight="bold">Subject Alternative Name (SAN)</text>
+    <text x="758" y="418">ss1   <tspan fill="#B23A3A" font-weight="bold">required in 7.7.0</tspan></text>
+    <text x="758" y="454" font-weight="bold">Serial Number</text><text x="900" y="454">LS-DEV/SS1/GOV</text>
+    <text x="900" y="476">(read-only)</text>
+    <text x="758" y="540" font-weight="bold">→ Generate CSR → Done</text>
+
+    <rect x="1160" y="100" width="210" height="470" rx="12" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2"/>
+    <text x="1178" y="134" font-size="19" font-weight="bold" fill="#2E7D55">Result</text>
+    <text x="1178" y="172">Browser downloads</text>
+    <text x="1178" y="194">a .der file</text>
+    <text x="1178" y="232">The key appears</text>
+    <text x="1178" y="254">under softToken-0</text>
+    <text x="1178" y="276">with a "Request"</text>
+    <text x="1178" y="298">line (the CSR)</text>
+    <text x="1178" y="342" font-weight="bold">Next: sign it at</text>
+    <text x="1178" y="364" font-weight="bold">the test CA</text>
+  </g>
+  <g stroke="#1F3A5F" stroke-width="3" marker-end="url(#a)"><line x1="332" y1="335" x2="366" y2="335"/><line x1="702" y1="335" x2="736" y2="335"/><line x1="1122" y1="335" x2="1156" y2="335"/></g>
+  <rect x="30" y="600" width="1340" height="80" rx="10" fill="#FBE9E9" stroke="#B23A3A"/>
+  <text x="50" y="634" font-size="16" fill="#1F2933"><tspan font-weight="bold" fill="#B23A3A">If "Generate CSR" fails with Signer.InternalError:</tspan> the Organization Name has a comma. Delete the half-made key if one</text>
+  <text x="50" y="660" font-size="16" fill="#1F2933">is left (click it → Delete) and run the wizard again with the comma removed.</text>
+</svg>

@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" font-family="DejaVu Sans, Arial, sans-serif">
+  <rect width="1400" height="760" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">Map of the Central Server admin UI (https://cs.lab:4000)</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">Top menu across the page; the boxes below each item are the pages and tabs inside it. Bold = used in this build.</text>
+
+  <rect x="30" y="100" width="1340" height="56" rx="10" fill="#1F3A5F"/>
+  <g font-size="18" font-weight="bold" fill="#fff">
+    <text x="55" y="135">Members</text><text x="265" y="135">Security Servers</text><text x="490" y="135">Management Requests</text>
+    <text x="760" y="135">Trust Services</text><text x="960" y="135">Global Configuration</text><text x="1230" y="135">Settings</text>
+  </g>
+
+  <g font-size="15" fill="#1F2933">
+    <!-- Members -->
+    <rect x="40" y="180" width="200" height="320" rx="10" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="54" y="210" font-weight="bold">Add member</text>
+    <text x="54" y="238">(name, class, code)</text>
+    <text x="54" y="276" font-weight="bold">Click a member:</text>
+    <text x="64" y="302">· Details</text>
+    <text x="64" y="326" font-weight="bold">· Subsystems</text>
+    <text x="78" y="350">→ Add subsystem</text>
+    <text x="64" y="374">· Management</text><text x="78" y="396">Requests</text>
+    <text x="54" y="440" fill="#4A5563">Phase 1, step 1.5</text>
+
+    <!-- Security Servers -->
+    <rect x="255" y="180" width="210" height="320" rx="10" fill="#F1F3F6" stroke="#5B6573" stroke-width="2"/>
+    <text x="269" y="210" font-weight="bold">List of SS1, SS2, SS3</text>
+    <text x="269" y="248">Click a server:</text>
+    <text x="279" y="274">· Details</text>
+    <text x="279" y="298">· Clients</text>
+    <text x="279" y="322">· Authentication</text><text x="293" y="344">Certificates</text>
+    <text x="279" y="368">· Management</text><text x="293" y="390">Requests</text>
+    <text x="269" y="440" fill="#4A5563">For checking only</text>
+
+    <!-- Management requests -->
+    <rect x="480" y="180" width="255" height="320" rx="10" fill="#FFF7D6" stroke="#9A7B00" stroke-width="2"/>
+    <text x="494" y="210" font-weight="bold">Every registration</text>
+    <text x="494" y="232" font-weight="bold">request lands here</text>
+    <text x="494" y="270">☐ Show only pending requests</text>
+    <text x="494" y="306">Row: type, Server Identifier,</text>
+    <text x="494" y="328">Server Owner Name, status</text>
+    <text x="494" y="366" font-weight="bold">Approve / Decline</text>
+    <text x="494" y="388">on each pending row</text>
+    <text x="494" y="440" fill="#4A5563">Phases 2, 3 and 4</text>
+
+    <!-- Trust Services -->
+    <rect x="750" y="180" width="200" height="320" rx="10" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="764" y="210" font-weight="bold">Certification</text><text x="764" y="232" font-weight="bold">Services</text>
+    <text x="774" y="258">→ Add certification</text><text x="788" y="280">service</text>
+    <text x="764" y="310">Click Test CA:</text>
+    <text x="774" y="334">· Details · CA Settings</text>
+    <text x="774" y="358" font-weight="bold">· OCSP Responders</text>
+    <text x="774" y="382">· Intermediate CAs</text>
+    <text x="764" y="414" font-weight="bold" font-size="13.5">Timestamping Services</text>
+    <text x="764" y="440" fill="#4A5563">Steps 1.3, 1.4</text>
+
+    <!-- Global Configuration -->
+    <rect x="965" y="180" width="225" height="320" rx="10" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="979" y="210" font-weight="bold">Internal Configuration</text>
+    <text x="989" y="236">· Anchor → Download</text>
+    <text x="989" y="260">· Download URL</text>
+    <text x="989" y="284">· Signing Keys</text><text x="1003" y="306">(Log in, Add key)</text>
+    <text x="989" y="330">· Configuration Parts</text>
+    <text x="979" y="366" font-weight="bold">External Configuration</text>
+    <text x="989" y="390">· Signing Keys</text>
+    <text x="979" y="420">Trusted Anchors</text>
+    <text x="979" y="446" fill="#4A5563">Steps 1.7, 1.8</text>
+
+    <!-- Settings -->
+    <rect x="1205" y="180" width="160" height="320" rx="10" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="1219" y="210" font-weight="bold">System</text><text x="1219" y="232" font-weight="bold">Settings</text>
+    <text x="1229" y="258">· System</text><text x="1243" y="280">Parameters</text>
+    <text x="1229" y="304" font-weight="bold">· Member</text><text x="1243" y="326" font-weight="bold">Classes</text>
+    <text x="1229" y="350" font-weight="bold">· Management</text><text x="1243" y="372" font-weight="bold">Services</text>
+    <text x="1219" y="402">Global Resources</text>
+    <text x="1219" y="426">API Keys</text>
+    <text x="1219" y="450">TLS Certificates</text>
+    <text x="1219" y="474" font-size="13.5">Backup And Restore</text>
+  </g>
+
+  <rect x="40" y="530" width="1325" height="200" rx="10" fill="#F7F8FA" stroke="#C9CFD8"/>
+  <text x="60" y="566" font-size="18" font-weight="bold" fill="#1F2933">Settings → System Settings, in detail (you will come back here three times)</text>
+  <g font-size="16" fill="#1F2933">
+    <text x="60" y="602"><tspan font-weight="bold">System Parameters:</tspan> Instance Identifier (LS-DEV), Central Server Address (cs)</text>
+    <text x="60" y="634"><tspan font-weight="bold">Member Classes:</tspan> Add → Code GOV, Description</text>
+    <text x="60" y="666"><tspan font-weight="bold">Management Services:</tspan> Service Provider Identifier · Management Services' Security Server · WSDL Address ·</text>
+    <text x="80" y="694">Management Services Address · Security Server Owners Group Code · TLS certificate Download</text>
+  </g>
+</svg>

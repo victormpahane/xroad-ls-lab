@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780" font-family="DejaVu Sans, Arial, sans-serif">
+  <rect width="1400" height="780" fill="#fff"/>
+  <text x="30" y="44" font-size="26" font-weight="bold" fill="#1F2933">Map of a Security Server admin UI (ss1, ss2 and ss3 look the same)</text>
+  <text x="30" y="74" font-size="17" fill="#4A5563">Four top menu items. Bold = used in this build.</text>
+
+  <rect x="30" y="100" width="1340" height="56" rx="10" fill="#2E7D55"/>
+  <g font-size="19" font-weight="bold" fill="#fff">
+    <text x="60" y="135">Clients</text><text x="430" y="135">Keys and certificates</text><text x="830" y="135">Diagnostics</text><text x="1140" y="135">Settings</text>
+  </g>
+
+  <g font-size="15" fill="#1F2933">
+    <!-- Clients -->
+    <rect x="40" y="180" width="370" height="420" rx="10" fill="#E4F4EC" stroke="#2E7D55" stroke-width="2"/>
+    <text x="54" y="210" font-weight="bold">List: owner member + its subsystems</text>
+    <text x="54" y="236">Status: REGISTERED / SAVED /</text><text x="54" y="258">REGISTRATION IN PROGRESS</text>
+    <text x="54" y="290" font-weight="bold">Add subsystem (on the owner row)</text>
+    <text x="64" y="314">→ Select subsystem → Add → Register? Yes</text>
+    <text x="54" y="350" font-weight="bold">Click a subsystem, tabs:</text>
+    <text x="64" y="376">· Details</text>
+    <text x="64" y="400" font-weight="bold">· Service clients → Add subject</text>
+    <text x="64" y="424" font-weight="bold">· Services → Add WSDL / Add REST</text>
+    <text x="84" y="448">expand → click a service →</text>
+    <text x="84" y="470">Service Parameters · Endpoints</text>
+    <text x="64" y="494" font-weight="bold">· Internal servers</text>
+    <text x="84" y="518">Connection type · Information</text>
+    <text x="84" y="540">System TLS certificate → Add</text>
+    <text x="64" y="564">· Local groups</text>
+
+    <!-- Keys -->
+    <rect x="425" y="180" width="380" height="420" rx="10" fill="#E3EEF9" stroke="#2B5F96" stroke-width="2"/>
+    <text x="439" y="210" font-weight="bold">Tab: SIGN and AUTH Keys</text>
+    <text x="449" y="238">Token row "softToken-0":</text>
+    <text x="459" y="262" font-weight="bold">Log in · Add key · Import cert.</text>
+    <text x="449" y="296">Under it, two groups:</text>
+    <text x="459" y="320">AUTH Keys and Certificates</text>
+    <text x="459" y="344">SIGN Keys and Certificates</text>
+    <text x="449" y="378">Each key row: label, CSR, certificate,</text>
+    <text x="449" y="400">OCSP (Good), status (Saved,</text>
+    <text x="449" y="422">Registration in progress, Registered)</text>
+    <text x="449" y="456" font-weight="bold">Click a certificate:</text>
+    <text x="459" y="480">Activate · Disable · Register ·</text>
+    <text x="459" y="502">Unregister · Delete</text>
+    <text x="439" y="540">Tab: API Keys</text>
+    <text x="439" y="564">Tab: Security Server TLS Key</text>
+
+    <!-- Diagnostics -->
+    <rect x="820" y="180" width="300" height="420" rx="10" fill="#FFF7D6" stroke="#9A7B00" stroke-width="2"/>
+    <text x="834" y="210" font-weight="bold">Tab: Overview</text>
+    <text x="844" y="238">· Java version</text>
+    <text x="844" y="262" font-weight="bold">· Global configuration</text>
+    <text x="844" y="286" font-weight="bold">· Timestamping</text>
+    <text x="844" y="310" font-weight="bold">· OCSP responders</text>
+    <text x="844" y="334">· Proxy memory usage</text>
+    <text x="844" y="358">· Mail notification status</text>
+    <text x="844" y="382">· Encryption, maintenance</text>
+    <text x="834" y="420">Green = "Everything ok"</text>
+    <text x="834" y="456">Tab: Traffic</text>
+    <text x="834" y="500" fill="#4A5563">Your health check after</text>
+    <text x="834" y="522" fill="#4A5563">every phase</text>
+
+    <!-- Settings -->
+    <rect x="1135" y="180" width="230" height="420" rx="10" fill="#F1F3F6" stroke="#5B6573" stroke-width="2"/>
+    <text x="1149" y="210" font-weight="bold">Tab: System</text><text x="1149" y="232" font-weight="bold">Parameters</text>
+    <text x="1159" y="260">· Configuration</text><text x="1173" y="282">Anchor</text>
+    <text x="1159" y="306" font-weight="bold">· Timestamping</text><text x="1173" y="328" font-weight="bold">Services → Add</text>
+    <text x="1159" y="352">· Approved</text><text x="1173" y="374">Certificate</text><text x="1173" y="396">Authorities</text>
+    <text x="1159" y="420">· Security Server</text><text x="1173" y="442">address</text>
+    <text x="1149" y="480">Tab: Backup And</text><text x="1149" y="502">Restore</text>
+  </g>
+  <rect x="40" y="625" width="1325" height="130" rx="10" fill="#F7F8FA" stroke="#C9CFD8"/>
+  <text x="60" y="660" font-size="18" font-weight="bold" fill="#1F2933">First login on a new Security Server: the Initial configuration wizard</text>
+  <text x="60" y="694" font-size="16" fill="#1F2933">Step 1 <tspan font-weight="bold">Configuration Anchor</tspan> (upload the file)  →  Step 2 <tspan font-weight="bold">Owner Member</tspan> (Member Class, Member Code, Security Server Code)</text>
+  <text x="60" y="724" font-size="16" fill="#1F2933">→  Step 3 <tspan font-weight="bold">Token PIN</tspan> (PIN, Confirm PIN)  →  Submit. It appears only once; afterwards you get the four menus above.</text>
+</svg>
